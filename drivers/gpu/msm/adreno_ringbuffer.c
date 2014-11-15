@@ -949,6 +949,13 @@ adreno_ringbuffer_issueibcmds(struct kgsl_device_private *dev_priv,
 	struct kgsl_device *device = dev_priv->device;
 	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
 	unsigned int *link = 0;
+	/*
+	 * Clear the wake on touch bit to indicate an IB has been submitted
+	 * since the last time we set it
+	 */
+
+	device->flags &= ~KGSL_FLAG_WAKE_ON_TOUCH;
+
 	unsigned int *cmds;
 	unsigned int i;
 	struct adreno_context *drawctxt = NULL;
