@@ -1107,6 +1107,7 @@ static int kgsl_release(struct inode *inodep, struct file *filep)
 		/*
 		 * active_cnt special case: we just stopped the device,
 		 * so no need to use kgsl_active_count_put()
+		result = device->ftbl->start(device, 0);
 		 */
 		device->active_cnt--;
 	} else {
@@ -3483,7 +3484,7 @@ int kgsl_postmortem_dump(struct kgsl_device *device, int manual)
 	device->pwrctrl.nap_allowed = false;
 
 	/* Force on the clocks */
-	kgsl_pwrctrl_wake(device);
+	kgsl_pwrctrl_wake(device, 0);
 
 	/* Disable the irq */
 	kgsl_pwrctrl_irq(device, KGSL_PWRFLAGS_OFF);
