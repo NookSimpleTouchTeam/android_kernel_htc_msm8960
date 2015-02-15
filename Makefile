@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -funsafe-loop-optimizations -funswitch-loops -fno-tree-vectorize -DNDEBUG -Wno-error=unused-parameter -Wno-error=unused-but-set-variable -funsafe-math-optimizations -flto -flto-compression-level=3 -floop-nest-optimize -Wundef $(call cc-disable-warning,maybe-uninitialized) $(call cc-disable-warning,array-bounds)
-HOSTCXXFLAGS = -Ofast -funsafe-loop-optimizations -funswitch-loops -fno-tree-vectorize -DNDEBUG -Wno-error=unused-parameter -Wno-error=unused-but-set-variable -funsafe-math-optimizations -flto -flto-compression-level=3 -floop-nest-optimize -Wundef $(call cc-disable-warning,maybe-uninitialized) $(call cc-disable-warning,array-bounds)
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
+HOSTCXXFLAGS = -O2
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -562,8 +562,11 @@ endif # $(dot-config)
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-
-KBUILD_CFLAGS	+= -Ofast -funsafe-loop-optimizations -funswitch-loops -fno-tree-vectorize -DNDEBUG -Wno-error=unused-parameter -Wno-error=unused-but-set-variable -funsafe-math-optimizations -flto -flto-compression-level=3 -floop-nest-optimize -Wundef $(call cc-disable-warning,maybe-uninitialized) $(call cc-disable-warning,array-bounds)
+ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+KBUILD_CFLAGS	+= -Os
+else
+KBUILD_CFLAGS	+= -O2
+endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
