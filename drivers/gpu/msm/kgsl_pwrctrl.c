@@ -450,11 +450,17 @@ static int kgsl_pwrctrl_gpuclk_show(struct device *dev,
 {
 	struct kgsl_device *device = kgsl_device_from_dev(dev);
 	struct kgsl_pwrctrl *pwr;
+	unsigned int level;
+
 	if (device == NULL)
 		return 0;
 	pwr = &device->pwrctrl;
+	if (device->state == KGSL_STATE_SLUMBER)
+		level = pwr->num_pwrlevels - 1;
+	else
+		level = pwr->active_pwrlevel;
 	return snprintf(buf, PAGE_SIZE, "%d\n",
-			pwr->pwrlevels[pwr->active_pwrlevel].gpu_freq);
+			pwr->pwrlevels[level].gpu_freq);
 }
 
 static int kgsl_pwrctrl_pwrnap_store(struct device *dev,
@@ -900,8 +906,11 @@ int kgsl_pwrctrl_init(struct kgsl_device *device)
 
 	pwr->max_pwrlevel = 0;
 	pwr->min_pwrlevel = pdata->num_levels - 2;
+#ifdef CONFIG_GPU_OVERCLOCK
+	pwr->thermal_pwrlevel = 3;
+#else
 	pwr->thermal_pwrlevel = 0;
-
+#endif
 	pwr->active_pwrlevel = pdata->init_level;
 	pwr->default_pwrlevel = pdata->init_level;
 	for (i = 0; i < pdata->num_levels; i++) {
